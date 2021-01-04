@@ -68,16 +68,16 @@ local function doVote( caller, args, optionCount )
         voteResults[index] = 0
         message = message .. index .. ": " .. option .. "\n"
         notif:AddButton( index, CFC_Vote.BUTTON_COLOR, index )
-        liveNotif:AddButton( index .. ": 0", CFC_Vote.BUTTON_COLOR )
+        liveNotif:AddButton( " --" .. index .. "--\n   0", CFC_Vote.BUTTON_COLOR )
     end
 
     voteResults[optionCount + 1] = #voters
-    liveNotif:AddButton( "?: " .. voteResults[optionCount + 1], Color( 0, 0, 0, 255 ) )
+    liveNotif:AddButton( " --?--\n   " .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ) )
 
     setNotifSettings( notif, message )
-    setNotifSettings( liveNotif, message .. "\nThese are the live results!\nPress any button to stop the vote early." )
+    setNotifSettings( liveNotif, message .. "?: No response\n\nThese are the live results!\nPress any button to stop the vote early." )
 
-    resultNotif:SetText( message .. "\n These are the results!\nPress any button to close this message." )
+    resultNotif:SetText( message .. "?: No response\n\n These are the results!\nPress any button to close this message." )
     resultNotif:SetDisplayTime( CFC_Vote.RESULTS_DURATION:GetFloat():GetFloat() )
     resultNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
     resultNotif:SetCloseable( false )
@@ -132,10 +132,10 @@ local function doVote( caller, args, optionCount )
                 color = Color( 0, 255, 0, 255 )
             end
 
-            resultNotif:AddButton( index .. ": " .. voteResults[index], color )
+            resultNotif:AddButton( " --" .. index .. "--\n   " .. voteResults[index], color )
         end
 
-        resultNotif:AddButton( "?: " .. voteResults[optionCount + 1], Color( 0, 0, 0, 255 ) )
+        resultNotif:AddButton( " --?--\n   " .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ) )
 
         resultNotif:Send( plys )
 
