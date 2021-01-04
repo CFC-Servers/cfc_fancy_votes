@@ -1,6 +1,5 @@
 CFC_Vote = CFC_Vote or {}
 
-local voteData = {}
 local voteResults = {}
 local voteInProgress = false
 local voteCaller
