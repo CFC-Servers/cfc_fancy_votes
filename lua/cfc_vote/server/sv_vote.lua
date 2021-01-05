@@ -151,7 +151,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
     if not ULib.ucl.query( ply, "ulx vote", true ) then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-            net.writeString( "There is already a vote in progress!" )
+            net.writeString( "You do not have access to this command, " .. ply:Nick() .. "." )
             net.Send( ply )
         else
             ply:ChatPrint( "You do not have access to this command, " .. ply:Nick() .. "." )
