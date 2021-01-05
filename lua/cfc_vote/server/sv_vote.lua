@@ -64,8 +64,8 @@ local function doVote( caller, args, optionCount )
 
     for index, option in pairs( args ) do
         voteResults[index] = 0
-        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, index, CFCNotifications.ALIGN_CENTER )
-        liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_CENTER )
+        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, index, CFCNotifications.ALIGN_LEFT )
+        liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_LEFT )
         liveNotif:NewButtonRow()
 
         if index < optionCount then
@@ -74,7 +74,7 @@ local function doVote( caller, args, optionCount )
     end
 
     voteResults[optionCount + 1] = #voters
-    liveNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_CENTER )
+    liveNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_LEFT )
 
     setNotifSettings( notif, question .. "\n\nClick on a button below to vote!" )
     setNotifSettings( liveNotif, question .. "\n\nThese are the live results!\nClick on any button to stop the vote early." )
@@ -132,11 +132,11 @@ local function doVote( caller, args, optionCount )
                 color = Color( 0, 255, 0, 255 )
             end
 
-            resultNotif:AddButtonAligned( option .. "\n" .. voteResults[index], color, CFCNotifications.ALIGN_CENTER )
+            resultNotif:AddButtonAligned( option .. "\n" .. voteResults[index], color, CFCNotifications.ALIGN_LEFT )
             resultNotif:NewButtonRow()
         end
 
-        resultNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_CENTER )
+        resultNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_LEFT )
         resultNotif:Send( plys )
 
         timer.Simple( CFC_Vote.RESULTS_DURATION:GetFloat(), function()
