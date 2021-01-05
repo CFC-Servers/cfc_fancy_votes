@@ -230,7 +230,6 @@ hook.Add( "PlayerSay", "CFC_Vote_StartVote", function( ply, text )
     text = text:sub( commandLength + 1 )
     text = text:Trim()
     local args = text:Split( ";" )
-    table.remove( args, 1 )
 
     timer.Simple( 0, function()
         CFC_Vote.tryVote( ply, false, args )
