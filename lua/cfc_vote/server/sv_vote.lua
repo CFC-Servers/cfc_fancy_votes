@@ -182,7 +182,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
             net.Send( ply )
         else
             ply:ChatPrint( "Not enough arguments! You need a question and at least two options. Arguments are separated out with a ;\n" ..
-                           "Example: " .. CFC_Vote.VOTE_COMMAND .. " Question;Option One;Option Two;Option Three" )
+                           "Example: " .. CFC_Vote.VOTE_COMMAND:GetString() .. " Question;Option One;Option Two;Option Three" )
         end
 
         return
@@ -198,7 +198,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
         else
             ply:ChatPrint( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() ..
                            ". Arguments are separated out with a ;\n" ..
-                           "Example: " .. CFC_Vote.VOTE_COMMAND .. " Question;Option One;Option Two;Option Three" )
+                           "Example: " .. CFC_Vote.VOTE_COMMAND:GetString() .. " Question;Option One;Option Two;Option Three" )
         end
 
         return
