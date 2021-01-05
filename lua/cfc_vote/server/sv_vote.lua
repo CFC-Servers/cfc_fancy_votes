@@ -80,7 +80,7 @@ local function doVote( caller, args, optionCount )
     setNotifSettings( liveNotif, question .. "\n\nThese are the live results!\nClick on any button to stop the vote early." )
     setNotifSettings( resultNotif, question .. "\n\nThese are the results!\nClick on any button to close this message." )
 
-    resultNotif:SetDisplayTime( CFC_Vote.RESULTS_DURATION:GetFloat():GetFloat() )
+    resultNotif:SetDisplayTime( CFC_Vote.RESULTS_DURATION:GetFloat() )
     resultNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
 
     function notif:OnButtonPressed( ply, index )
@@ -206,8 +206,8 @@ hook.Add( "PlayerSay", "CFC_Vote_StartVote", function( ply, text )
     table.remove( args, 1 )
 
     timer.Simple( 0, function()
-        tryVote( ply, false, args )
+        CFC_Vote.tryVote( ply, false, args )
     end )
 end )
 
-concommand.Add( "cfc_vote", tryVote )
+concommand.Add( "cfc_vote", CFC_Vote.tryVote )
