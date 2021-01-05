@@ -40,7 +40,6 @@ end
 
 local function doVote( caller, args, optionCount )
     local question = args[1]
-    local message = ""
     local plys = player.GetHumans()
 
     voters = table.Copy( plys )
@@ -58,30 +57,31 @@ local function doVote( caller, args, optionCount )
 
     CFCNotifications.new( CFC_Vote.NOTIFICATION_RESULTS_NAME, "Buttons", true )
     local resultNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_RESULTS_NAME )
-
-    notif:SetTitle( "Vote: " .. question )
-    liveNotif:SetTitle( "Results: " .. question )
-    resultNotif:SetTitle( "Results: " .. question )
+    
+    notif:SetTitle( "CFC Vote" )
+    liveNotif:SetTitle( "CFC Vote Live Results" )
+    resultNotif:SetTitle( "CFC Vote Results" )
 
     for index, option in pairs( args ) do
         voteResults[index] = 0
-        message = message .. index .. ": " .. option .. "\n"
-        notif:AddButton( index, CFC_Vote.BUTTON_COLOR, index )
-        liveNotif:AddButton( " --" .. index .. "--\n   0", CFC_Vote.BUTTON_COLOR )
+        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, index, CFCNotifications.ALIGN_CENTER )
+        liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_CENTER )
+        liveNotif:NewButtonRow()
+
+        if index < optionCount then
+            notif:NewButtonRow()
+        end
     end
 
     voteResults[optionCount + 1] = #voters
-    liveNotif:AddButton( " --?--\n   " .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ) )
+    liveNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_CENTER )
 
-    setNotifSettings( notif, message )
-    setNotifSettings( liveNotif, message .. "?: No response\n\nThese are the live results!\nPress any button to stop the vote early." )
+    setNotifSettings( notif, question .. "\n\nClick on a button below to vote!" )
+    setNotifSettings( liveNotif, question .. "\n\nThese are the live results!\nClick on any button to stop the vote early." )
+    setNotifSettings( resultNotif, question .. "\n\nThese are the results!\nClick on any button to close this message." )
 
-    resultNotif:SetText( message .. "?: No response\n\n These are the results!\nPress any button to close this message." )
     resultNotif:SetDisplayTime( CFC_Vote.RESULTS_DURATION:GetFloat():GetFloat() )
     resultNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
-    resultNotif:SetCloseable( false )
-    resultNotif:SetIgnoreable( false )
-    resultNotif:SetTimed( true )
 
     function notif:OnButtonPressed( ply, index )
         voteResults[index] = voteResults[index] + 1
@@ -93,6 +93,7 @@ local function doVote( caller, args, optionCount )
         net.WriteInt( voteResults[index], 9 )
         net.WriteInt( optionCount + 1, 9 )
         net.WriteInt( voteResults[optionCount + 1], 9 )
+        net.WriteString( args[index] )
         net.Send( caller )
     end
 
@@ -124,18 +125,18 @@ local function doVote( caller, args, optionCount )
             end
         end
 
-        for index = 1, optionCount do
+        for index, option in pairs( args ) do
             local color = CFC_Vote.BUTTON_COLOR
 
             if highInds[index] then
                 color = Color( 0, 255, 0, 255 )
             end
 
-            resultNotif:AddButton( " --" .. index .. "--\n   " .. voteResults[index], color )
+            resultNotif:AddButtonAligned( option .. "\n" .. voteResults[index], color, CFCNotifications.ALIGN_CENTER )
+            resultNotif:NewButtonRow()
         end
 
-        resultNotif:AddButton( " --?--\n   " .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ) )
-
+        resultNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_CENTER )
         resultNotif:Send( plys )
 
         timer.Simple( CFC_Vote.RESULTS_DURATION:GetFloat(), function()

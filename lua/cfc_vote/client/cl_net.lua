@@ -8,9 +8,10 @@ net.Receive( CFC_Vote.NET_LIVE_UPDATE, function()
             local count = net.ReadInt( 9 )
             local nonresponseIndex = net.ReadInt( 9 )
             local nonresponseCount = net.ReadInt( 9 )
+            local option = net.ReadString()
 
-            buttonPanels[index]:SetText( " --" .. index .. "--\n   " .. count )
-            buttonPanels[nonresponseIndex]:SetText( " --?--\n   " .. nonresponseCount )
+            buttonPanels[index]:SetText( option .. "\n" .. count )
+            buttonPanels[nonresponseIndex]:SetText( "No Response\n" .. nonresponseCount )
 
             break
         end
