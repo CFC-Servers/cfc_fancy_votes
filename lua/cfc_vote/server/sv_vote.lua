@@ -98,7 +98,7 @@ local function doVote( caller, args, optionCount )
     end
 
     function liveNotif:OnButtonPressed( ply )
-        stopVote()
+        CFC_Vote.stopVote()
     end
 
     function resultNotif:OnButtonPressed( ply )
