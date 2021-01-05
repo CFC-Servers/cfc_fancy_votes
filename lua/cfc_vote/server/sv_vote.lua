@@ -172,9 +172,11 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
 
     if optionCount < 2 then
         if fromConsole then
-            MsgN( "Not enough arguments! You need a question and at least two options." )
+            MsgN( "Not enough arguments! You need a question and at least two options. Surround each argument with quotes to separate them off\n" ..
+                  "Example: cfc_vote \"Question\" \"Option One\" \"Option Two\" \"Option Three\"" )
         else
-            ply:ChatPrint( "Not enough arguments! You need a question and at least two options." )
+            ply:ChatPrint( "Not enough arguments! You need a question and at least two options. Arguments are separated out with a ;\n" ..
+                           "Example: " .. CFC_Vote.VOTE_COMMAND .. " Question;Option One;Option Two;Option Three" )
         end
 
         return
@@ -182,9 +184,13 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
 
     if optionCount > CFC_Vote.VOTE_MAX_OPTIONS:GetInt() then
         if fromConsole then
-            MsgN( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() .. "." )
+            MsgN( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() ..
+                  ". Surround each argument with quotes to separate them off\n" ..
+                  "Example: cfc_vote \"Question\" \"Option One\" \"Option Two\" \"Option Three\"" )
         else
-            ply:ChatPrint( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() .. "." )
+            ply:ChatPrint( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() ..
+                           ". Arguments are separated out with a ;\n" ..
+                           "Example: " .. CFC_Vote.VOTE_COMMAND .. " Question;Option One;Option Two;Option Three" )
         end
 
         return
@@ -196,13 +202,24 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
         ply:ChatPrint( "Creating a vote..." )
     end
 
+    for index, option in pairs( args ) do
+        if index > 1 then
+            args[index] = string.Replace( option, "\n", "" )
+        end
+    end
+
     doVote( ply, args, optionCount )
 end
 
 hook.Add( "PlayerSay", "CFC_Vote_StartVote", function( ply, text )
-    if text:sub( 1, CFC_Vote.VOTE_COMMAND:GetString():len() ) ~= CFC_Vote.VOTE_COMMAND:GetString() then return end
+    local commandLength = CFC_Vote.VOTE_COMMAND:GetString():len()
 
-    local args = text:Split( " " )
+    if text:sub( 1, commandLength ) ~= CFC_Vote.VOTE_COMMAND:GetString() then return end
+    if text:len() == commandLength then return end
+
+    text = text:sub( commandLength + 1 )
+    text = text:Trim()
+    local args = text:Split( ";" )
     table.remove( args, 1 )
 
     timer.Simple( 0, function()
