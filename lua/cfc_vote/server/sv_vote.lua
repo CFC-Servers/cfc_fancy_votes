@@ -64,7 +64,7 @@ local function doVote( caller, args, optionCount )
 
     for index, option in pairs( args ) do
         voteResults[index] = 0
-        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, index, CFCNotifications.ALIGN_LEFT )
+        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_LEFT, index )
         liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_LEFT )
         liveNotif:NewButtonRow()
 
