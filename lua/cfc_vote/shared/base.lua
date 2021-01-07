@@ -5,7 +5,7 @@ CFC_Vote.NET_CONSOLE_PRINT = "CFC_Vote_ConsolePrint"
 CFC_Vote.NOTIFICATION_LIVE_NAME = "CFC_Vote_VoteLive"
 
 if CLIENT then
-    include( "cfc_vote/client/cl_net.lua" )
+    include( "cfc_vote/client/net.lua" )
     return
 end
 
@@ -21,4 +21,4 @@ CFC_Vote.NOTIFICATION_RESULTS_NAME = "CFC_Vote_VoteResults"
 CFC_Vote.NOTIFICATION_STOP_NAME = "CFC_Vote_VoteStop"
 CFC_Vote.BUTTON_COLOR = Color( 200, 220, 245, 255 )
 
-include( "cfc_vote/server/sv_vote.lua" )
+include( "cfc_vote/server/vote.lua" )
