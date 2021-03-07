@@ -1,6 +1,5 @@
 CFC_Vote = CFC_Vote or {}
 
-CFC_Vote.NET_LIVE_UPDATE = "CFC_Vote_LiveUpdate"
 CFC_Vote.NET_CONSOLE_PRINT = "CFC_Vote_ConsolePrint"
 CFC_Vote.NOTIFICATION_LIVE_NAME = "CFC_Vote_VoteLive"
 
@@ -9,7 +8,6 @@ if CLIENT then
     return
 end
 
-util.AddNetworkString( CFC_Vote.NET_LIVE_UPDATE )
 util.AddNetworkString( CFC_Vote.NET_CONSOLE_PRINT )
 
 CFC_Vote.VOTE_COMMAND = CreateConVar( "cfc_vote_chat_command", "!cfcvote", FCVAR_NONE, "Chat command for CFC Vote" )

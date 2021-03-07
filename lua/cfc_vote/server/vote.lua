@@ -82,13 +82,11 @@ local function doVote( caller, args, optionCount )
         voteResults[optionCount + 1] = voteResults[optionCount + 1] - 1
         notif:RemovePopup( notif:GetCallingPopupID(), ply )
 
-        net.Start( CFC_Vote.NET_LIVE_UPDATE )
-        net.WriteInt( index, 9 )
-        net.WriteInt( voteResults[index], 9 )
-        net.WriteInt( optionCount + 1, 9 )
-        net.WriteInt( voteResults[optionCount + 1], 9 )
-        net.WriteString( args[index] )
-        net.Send( caller )
+        local optionResultText = args[index] .. "\n" .. voteResults[index]
+        local UndecidedText = "No Response\n" .. voteResults[optionCount + 1]
+
+        liveNotif:EditButtonText( index, 1, optionResultText, voteCaller )
+        liveNotif:EditButtonText( optionCount + 1, 1, UndecidedText, voteCaller )
     end
 
     function liveNotif:OnButtonPressed( ply )
