@@ -27,8 +27,7 @@ function CFC_Vote.stopVote()
 
     timer.Remove( "CFC_Vote_VoteFinished" )
 
-    CFCNotifications.new( CFC_Vote.NOTIFICATION_STOP_NAME, "Text", true )
-    local stopNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_STOP_NAME )
+    local stopNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_STOP_NAME, "Text", true )
     setNotifSettings( stopNotif, "The vote was stopped early!" )
     stopNotif:SetTitle( "CFC Vote" )
     stopNotif:SetDisplayTime( 5 )
@@ -49,14 +48,9 @@ local function doVote( caller, args, optionCount )
     voteCaller = caller
     voteResults = {}
 
-    CFCNotifications.new( CFC_Vote.NOTIFICATION_VOTE_NAME, "Buttons", true )
-    local notif = CFCNotifications.get( CFC_Vote.NOTIFICATION_VOTE_NAME )
-
-    CFCNotifications.new( CFC_Vote.NOTIFICATION_LIVE_NAME, "Buttons", true )
-    local liveNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_LIVE_NAME )
-
-    CFCNotifications.new( CFC_Vote.NOTIFICATION_RESULTS_NAME, "Buttons", true )
-    local resultNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_RESULTS_NAME )
+    local notif = CFCNotifications.new( CFC_Vote.NOTIFICATION_VOTE_NAME, "Buttons", true )
+    local liveNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_LIVE_NAME, "Buttons", true )
+    local resultNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_RESULTS_NAME, "Buttons", true )
     
     notif:SetTitle( "CFC Vote" )
     liveNotif:SetTitle( "CFC Vote Live Results" )
