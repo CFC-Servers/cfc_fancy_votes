@@ -143,7 +143,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
     if not ULib.ucl.query( ply, "ulx vote", true ) then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-            net.writeString( "You do not have access to this command, " .. ply:Nick() .. "." )
+            net.WriteString( "You do not have access to this command, " .. ply:Nick() .. "." )
             net.Send( ply )
         else
             ply:ChatPrint( "You do not have access to this command, " .. ply:Nick() .. "." )
@@ -155,7 +155,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
     if voteInProgress then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-            net.writeString( "There is already a vote in progress!" )
+            net.WriteString( "There is already a vote in progress!" )
             net.Send( ply )
         else
             ply:ChatPrint( "There is already a vote in progress!" )
@@ -169,7 +169,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
     if optionCount < 2 then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-            net.writeString( "Not enough arguments! You need a question and at least two options. Surround each argument with quotes to separate them off\n" ..
+            net.WriteString( "Not enough arguments! You need a question and at least two options. Surround each argument with quotes to separate them off\n" ..
                              "Example: cfc_vote \"Question\" \"Option One\" \"Option Two\" \"Option Three\"" )
             net.Send( ply )
         else
@@ -183,7 +183,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
     if optionCount > CFC_Vote.VOTE_MAX_OPTIONS:GetInt() then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-            net.writeString( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() ..
+            net.WriteString( "Too many vote options! The maximum is " .. CFC_Vote.VOTE_MAX_OPTIONS:GetInt() ..
                              ". Surround each argument with quotes to separate them off\n" ..
                              "Example: cfc_vote \"Question\" \"Option One\" \"Option Two\" \"Option Three\"" )
             net.Send( ply )
@@ -198,7 +198,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
 
     if fromConsole then
         net.Start( CFC_Vote.NET_CONSOLE_PRINT )
-        net.writeString( "Creating a vote..." )
+        net.WriteString( "Creating a vote..." )
         net.Send( ply )
     else
         ply:ChatPrint( "Creating a vote..." )
