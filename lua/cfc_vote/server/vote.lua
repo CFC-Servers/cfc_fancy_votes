@@ -1,9 +1,9 @@
 CFC_Vote = CFC_Vote or {}
 
-local voteResults = {}
-local voteInProgress = false
-local voteCaller
-local voters
+CFC_Vote.voteResults = {}
+CFC_Vote.voteInProgress = false
+CFC_Vote.voteCaller = false
+CFC_Vote.voters = {}
 
 local function setNotifSettings( notif, text )
     notif:SetText( text )
@@ -17,13 +17,14 @@ end
 function CFC_Vote.stopVote()
     local notif = CFCNotifications.get( CFC_Vote.NOTIFICATION_VOTE_NAME )
     local liveNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_LIVE_NAME )
+    local voters = CFC_Vote.voters or {}
 
     for _, ply in pairs( voters ) do
         notif:RemovePopups( ply )
     end
 
-    liveNotif:RemovePopups( voteCaller )
-    table.insert( voters, voteCaller )
+    liveNotif:RemovePopups( CFC_Vote.voteCaller )
+    table.insert( voters, CFC_Vote.voteCaller )
 
     timer.Remove( "CFC_Vote_VoteFinished" )
 
@@ -34,19 +35,22 @@ function CFC_Vote.stopVote()
     stopNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
     stopNotif:Send( voters )
 
-    voteInProgress = false
+    CFC_Vote.voteInProgress = false
 end
 
 local function doVote( caller, args, optionCount )
     local question = args[1]
     local plys = player.GetHumans()
+    local voters = table.Copy( plys )
+    local voteResults = {}
 
-    voters = table.Copy( plys )
     table.RemoveByValue( voters, caller )
     table.remove( args, 1 )
-    voteInProgress = true
-    voteCaller = caller
-    voteResults = {}
+
+    CFC_Vote.voteInProgress = true
+    CFC_Vote.voteCaller = caller
+    CFC_Vote.voters = voters
+    CFC_Vote.voteResults = voteResults
 
     local notif = CFCNotifications.new( CFC_Vote.NOTIFICATION_VOTE_NAME, "Buttons", true )
     local liveNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_LIVE_NAME, "Buttons", true )
@@ -85,8 +89,8 @@ local function doVote( caller, args, optionCount )
         local optionResultText = args[index] .. "\n" .. voteResults[index]
         local UndecidedText = "No Response\n" .. voteResults[optionCount + 1]
 
-        liveNotif:EditButtonText( index, 1, optionResultText, voteCaller )
-        liveNotif:EditButtonText( optionCount + 1, 1, UndecidedText, voteCaller )
+        liveNotif:EditButtonText( index, 1, optionResultText, CFC_Vote.voteCaller )
+        liveNotif:EditButtonText( optionCount + 1, 1, UndecidedText, CFC_Vote.voteCaller )
     end
 
     function liveNotif:OnButtonPressed( ply )
@@ -132,7 +136,7 @@ local function doVote( caller, args, optionCount )
         resultNotif:Send( plys )
 
         timer.Simple( CFC_Vote.RESULTS_DURATION:GetFloat(), function()
-            voteInProgress = false
+            CFC_Vote.voteInProgress = false
         end )
     end )
 end
@@ -152,7 +156,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
         return
     end
 
-    if voteInProgress then
+    if CFC_Vote.voteInProgress then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
             net.WriteString( "There is already a vote in progress!" )
