@@ -265,3 +265,40 @@ hook.Add( "PlayerSay", "CFC_Vote_StartVote", function( ply, text )
 end )
 
 concommand.Add( "cfc_vote", CFC_Vote.tryVote )
+
+if not ulx then return end
+
+local function voteFromULX( caller, title, ... )
+    if not IsValid( caller ) then return end
+
+    if CFC_Vote.voteInProgress then
+		ULib.tsayError( caller, "There is already a CFC vote in progress. Please wait for the current one to end.", true )
+		return
+	end
+
+    local args = { ... }
+    local maxOptions = CFC_Vote.VOTE_MAX_OPTIONS:GetInt()
+
+    for index, option in pairs( args ) do
+        if index > maxOptions then
+            args[index] = nil
+        else
+            args[index] = string.Replace( option, "\n", "" )
+        end
+    end
+
+    net.Start( CFC_Vote.NET_CONSOLE_PRINT )
+    net.WriteString( "Creating a vote..." )
+    net.Send( caller )
+
+    caller:ChatPrint( "Creating a vote..." )
+
+    table.insert( args, 1, title )
+    doVote( caller, args, #args - 1 )
+end
+
+local voteCmd = ulx.command( "Voting", "ulx cfcvote", voteFromULX )
+voteCmd:addParam{ type=ULib.cmds.StringArg, hint="title" }
+voteCmd:addParam{ type=ULib.cmds.StringArg, hint="options", ULib.cmds.takeRestOfLine, repeat_min=2, repeat_max=CFC_Vote.VOTE_MAX_OPTIONS:GetInt() }
+voteCmd:defaultAccess( ULib.ACCESS_ADMIN )
+voteCmd:help( "Starts a fancy public vote." )
