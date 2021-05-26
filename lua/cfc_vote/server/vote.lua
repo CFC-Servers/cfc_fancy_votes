@@ -14,22 +14,21 @@ local function setNotifSettings( notif, text )
     notif:SetTimed( true )
 end
 
-function CFC_Vote.stopVote()
+function CFC_Vote.stopVote( byAdmin )
     local notif = CFCNotifications.get( CFC_Vote.NOTIFICATION_VOTE_NAME )
     local liveNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_LIVE_NAME )
+    local adminNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_ADMIN_NAME )
     local voters = CFC_Vote.voters or {}
 
-    for _, ply in pairs( voters ) do
-        notif:RemovePopups( ply )
-    end
+    notif:Remove()
+    liveNotif:Remove()
+    adminNotif:Remove()
 
-    liveNotif:RemovePopups( CFC_Vote.voteCaller )
     table.insert( voters, CFC_Vote.voteCaller )
-
     timer.Remove( "CFC_Vote_VoteFinished" )
 
     local stopNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_STOP_NAME, "Text", true )
-    setNotifSettings( stopNotif, "The vote was stopped early!" )
+    setNotifSettings( stopNotif, "The vote was stopped early" .. ( byAdmin and " by an admin!" or "!" ) )
     stopNotif:SetTitle( "CFC Vote" )
     stopNotif:SetDisplayTime( 5 )
     stopNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
@@ -43,9 +42,24 @@ local function doVote( caller, args, optionCount )
     local plys = player.GetHumans()
     local voters = table.Copy( plys )
     local voteResults = {}
+    local adminPlys = {}
 
     table.RemoveByValue( voters, caller )
     table.remove( args, 1 )
+
+    for i, ply in pairs( plys ) do
+        local isVoteAdmin
+
+        if ULib then
+            isVoteAdmin = ULib.ucl.query( ply, "ulx stopvote", true )
+        else
+            isVoteAdmin = ply:IsAdmin()
+        end
+
+        if isVoteAdmin then
+            table.insert( adminPlys, ply )
+        end
+    end
 
     CFC_Vote.voteInProgress = true
     CFC_Vote.voteCaller = caller
@@ -55,15 +69,17 @@ local function doVote( caller, args, optionCount )
     local notif = CFCNotifications.new( CFC_Vote.NOTIFICATION_VOTE_NAME, "Buttons", true )
     local liveNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_LIVE_NAME, "Buttons", true )
     local resultNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_RESULTS_NAME, "Buttons", true )
-    
+    local adminNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_ADMIN_NAME, "Buttons", true )
+
     notif:SetTitle( "CFC Vote" )
     liveNotif:SetTitle( "CFC Vote Live Results" )
     resultNotif:SetTitle( "CFC Vote Results" )
+    adminNotif:SetTitle( "CFC Vote Admin Info" )
 
     for index, option in pairs( args ) do
         voteResults[index] = 0
-        notif:AddButtonAligned( option, CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_LEFT, index )
-        liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_COLOR, CFCNotifications.ALIGN_LEFT )
+        notif:AddButtonAligned( option, CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT, index )
+        liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT )
         liveNotif:NewButtonRow()
 
         if index < optionCount then
@@ -74,9 +90,13 @@ local function doVote( caller, args, optionCount )
     voteResults[optionCount + 1] = #voters
     liveNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_LEFT )
 
+    adminNotif:AddButtonAligned( "Stop the vote", CFC_Vote.BUTTON_STOP_COLOR, CFCNotifications.ALIGN_CENTER, true )
+    adminNotif:AddButtonAligned( "Discard this", CFC_Vote.BUTTON_DISCARD_COLOR, CFCNotifications.ALIGN_CENTER, false )
+
     setNotifSettings( notif, question .. "\n\nClick on a button below to vote!" )
     setNotifSettings( liveNotif, question .. "\n\nThese are the live results!\nClick on any button to stop the vote early." )
     setNotifSettings( resultNotif, question .. "\n\nThese are the results!\nClick on any button to close this message." )
+    setNotifSettings( adminNotif, "The current vote was created by\n" .. caller:Nick() .. " " .. caller:SteamID() )
 
     resultNotif:SetDisplayTime( CFC_Vote.RESULTS_DURATION:GetFloat() )
     resultNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
@@ -101,6 +121,13 @@ local function doVote( caller, args, optionCount )
         resultNotif:RemovePopup( resultNotif:GetCallingPopupID(), ply )
     end
 
+    function adminNotif:OnButtonPressed( ply, stop )
+        if not stop then return end
+
+        CFC_Vote.stopVote( true )
+    end
+
+    adminNotif:Send( adminPlys )
     notif:Send( voters )
     liveNotif:Send( caller )
 
@@ -122,7 +149,7 @@ local function doVote( caller, args, optionCount )
         end
 
         for index, option in pairs( args ) do
-            local color = CFC_Vote.BUTTON_COLOR
+            local color = CFC_Vote.BUTTON_VOTE_COLOR
 
             if highInds[index] then
                 color = Color( 0, 255, 0, 255 )
@@ -144,7 +171,7 @@ end
 function CFC_Vote.tryVote( ply, fromConsole, args )
     if not IsValid( ply ) then return end
 
-    if not ULib.ucl.query( ply, "ulx vote", true ) then
+    if ULib and not ULib.ucl.query( ply, "ulx vote", true ) then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
             net.WriteString( "You do not have access to this command, " .. ply:Nick() .. "." )
