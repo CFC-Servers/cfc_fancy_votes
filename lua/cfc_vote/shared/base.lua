@@ -16,7 +16,10 @@ CFC_Vote.VOTE_DURATION = CreateConVar( "cfc_vote_duration", 30, FCVAR_NONE, "How
 CFC_Vote.RESULTS_DURATION = CreateConVar( "cfc_vote_results_duration", 15, FCVAR_NONE, "How long vote results will last for, in seconds", 1, 50000 )
 CFC_Vote.NOTIFICATION_VOTE_NAME = "CFC_Vote_VoteQuery"
 CFC_Vote.NOTIFICATION_RESULTS_NAME = "CFC_Vote_VoteResults"
+CFC_Vote.NOTIFICATION_ADMIN_NAME = "CFC_Vote_AdminInfo"
 CFC_Vote.NOTIFICATION_STOP_NAME = "CFC_Vote_VoteStop"
-CFC_Vote.BUTTON_COLOR = Color( 200, 220, 245, 255 )
+CFC_Vote.BUTTON_VOTE_COLOR = Color( 200, 220, 245, 255 )
+CFC_Vote.BUTTON_STOP_COLOR = Color( 230, 58, 64, 255 )
+CFC_Vote.BUTTON_DISCARD_COLOR = Color( 230, 153, 58, 255 )
 
 include( "cfc_vote/server/vote.lua" )
