@@ -47,7 +47,7 @@ local function doVote( caller, args, optionCount )
     table.RemoveByValue( voters, caller )
     table.remove( args, 1 )
 
-    for i, ply in pairs( plys ) do
+    for i, ply in ipairs( plys ) do
         local isVoteAdmin
 
         if ULib then
@@ -79,7 +79,7 @@ local function doVote( caller, args, optionCount )
     liveNotif:AddButtonAligned( "Stop the vote", CFC_Vote.BUTTON_STOP_COLOR, CFCNotifications.ALIGN_CENTER )
     liveNotif:NewButtonRow()
 
-    for index, option in pairs( args ) do
+    for index, option in ipairs( args ) do
         voteResults[index] = 0
         notif:AddButtonAligned( option, CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT, index )
         liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT )
@@ -118,7 +118,7 @@ local function doVote( caller, args, optionCount )
         liveNotif:EditButtonText( optionCount + 2, 1, UndecidedText, CFC_Vote.voteCaller )
     end
 
-    function liveNotif:OnButtonPressed( ply )
+    function liveNotif:OnButtonPressed()
         CFC_Vote.stopVote()
     end
 
@@ -126,7 +126,7 @@ local function doVote( caller, args, optionCount )
         resultNotif:RemovePopup( resultNotif:GetCallingPopupID(), ply )
     end
 
-    function adminNotif:OnButtonPressed( ply, stop )
+    function adminNotif:OnButtonPressed( _, stop )
         if not stop then return end
 
         CFC_Vote.stopVote( true )
@@ -153,7 +153,7 @@ local function doVote( caller, args, optionCount )
             end
         end
 
-        for index, option in pairs( args ) do
+        for index, option in ipairs( args ) do
             local color = CFC_Vote.BUTTON_VOTE_COLOR
 
             if highInds[index] then
@@ -240,7 +240,7 @@ function CFC_Vote.tryVote( ply, fromConsole, args )
         ply:ChatPrint( "Creating a vote..." )
     end
 
-    for index, option in pairs( args ) do
+    for index, option in ipairs( args ) do
         if index > 1 then
             args[index] = string.Replace( option, "\n", "" )
         end
@@ -279,7 +279,7 @@ local function voteFromULX( caller, title, ... )
     local args = { ... }
     local maxOptions = CFC_Vote.VOTE_MAX_OPTIONS:GetInt()
 
-    for index, option in pairs( args ) do
+    for index, option in ipairs( args ) do
         if index > maxOptions then
             args[index] = nil
         else
