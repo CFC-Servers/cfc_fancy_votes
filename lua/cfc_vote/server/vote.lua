@@ -56,7 +56,7 @@ local function doVote( caller, args, optionCount )
             isVoteAdmin = ply:IsAdmin()
         end
 
-        if isVoteAdmin then
+        if isVoteAdmin and ply ~= caller then
             table.insert( adminPlys, ply )
         end
     end
@@ -76,10 +76,14 @@ local function doVote( caller, args, optionCount )
     resultNotif:SetTitle( "CFC Vote Results" )
     adminNotif:SetTitle( "CFC Vote Admin Info" )
 
+    liveNotif:AddButtonAligned( "Stop the vote", CFC_Vote.BUTTON_STOP_COLOR, CFCNotifications.ALIGN_CENTER )
+    liveNotif:NewButtonRow()
+
     for index, option in pairs( args ) do
         voteResults[index] = 0
         notif:AddButtonAligned( option, CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT, index )
         liveNotif:AddButtonAligned( option .. "\n0", CFC_Vote.BUTTON_VOTE_COLOR, CFCNotifications.ALIGN_LEFT )
+        liveNotif:EditButtonCanPress( index + 1, 1, false )
         liveNotif:NewButtonRow()
 
         if index < optionCount then
@@ -89,12 +93,13 @@ local function doVote( caller, args, optionCount )
 
     voteResults[optionCount + 1] = #voters
     liveNotif:AddButtonAligned( "No Response\n" .. voteResults[optionCount + 1], Color( 255, 0, 0, 255 ), CFCNotifications.ALIGN_LEFT )
+    liveNotif:EditButtonCanPress( optionCount + 2, 1, false )
 
     adminNotif:AddButtonAligned( "Stop the vote", CFC_Vote.BUTTON_STOP_COLOR, CFCNotifications.ALIGN_CENTER, true )
     adminNotif:AddButtonAligned( "Discard this", CFC_Vote.BUTTON_DISCARD_COLOR, CFCNotifications.ALIGN_CENTER, false )
 
     setNotifSettings( notif, question .. "\n\nClick on a button below to vote!" )
-    setNotifSettings( liveNotif, question .. "\n\nThese are the live results!\nClick on any button to stop the vote early." )
+    setNotifSettings( liveNotif, question .. "\n\nThese are the live results!" )
     setNotifSettings( resultNotif, question .. "\n\nThese are the results!\nClick on any button to close this message." )
     setNotifSettings( adminNotif, "The current vote was created by\n" .. caller:Nick() .. " " .. caller:SteamID() )
 
@@ -109,8 +114,8 @@ local function doVote( caller, args, optionCount )
         local optionResultText = args[index] .. "\n" .. voteResults[index]
         local UndecidedText = "No Response\n" .. voteResults[optionCount + 1]
 
-        liveNotif:EditButtonText( index, 1, optionResultText, CFC_Vote.voteCaller )
-        liveNotif:EditButtonText( optionCount + 1, 1, UndecidedText, CFC_Vote.voteCaller )
+        liveNotif:EditButtonText( index + 1, 1, optionResultText, CFC_Vote.voteCaller )
+        liveNotif:EditButtonText( optionCount + 2, 1, UndecidedText, CFC_Vote.voteCaller )
     end
 
     function liveNotif:OnButtonPressed( ply )
