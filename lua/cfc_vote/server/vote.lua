@@ -176,7 +176,7 @@ end
 function CFC_Vote.tryVote( ply, fromConsole, args )
     if not IsValid( ply ) then return end
 
-    if ULib and not ULib.ucl.query( ply, "ulx vote", true ) then
+    if ULib and not ULib.ucl.query( ply, "ulx cfcvote", true ) then
         if fromConsole then
             net.Start( CFC_Vote.NET_CONSOLE_PRINT )
             net.WriteString( "You do not have access to this command, " .. ply:Nick() .. "." )
