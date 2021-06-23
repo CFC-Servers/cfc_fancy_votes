@@ -4,6 +4,7 @@ CFC_Vote.voteResults = {}
 CFC_Vote.voteInProgress = false
 CFC_Vote.voteCaller = false
 CFC_Vote.voters = {}
+CFC_Vote.undecidedVoters = {}
 
 local function setNotifSettings( notif, text )
     notif:SetText( text )
@@ -15,6 +16,8 @@ local function setNotifSettings( notif, text )
 end
 
 function CFC_Vote.stopVote( byAdmin )
+    if not CFC_Vote.voteInProgress then return end
+
     local notif = CFCNotifications.get( CFC_Vote.NOTIFICATION_VOTE_NAME )
     local liveNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_LIVE_NAME )
     local adminNotif = CFCNotifications.get( CFC_Vote.NOTIFICATION_ADMIN_NAME )
@@ -37,12 +40,20 @@ function CFC_Vote.stopVote( byAdmin )
     CFC_Vote.voteInProgress = false
 end
 
+local function playerStopVote( ply )
+    if CFC_Vote.voteCaller ~= ply then return end
+
+    CFC_Vote.stopVote()
+end
+
 local function doVote( caller, args, optionCount )
     local question = args[1]
     local plys = player.GetHumans()
     local voters = table.Copy( plys )
     local voteResults = {}
     local adminPlys = {}
+    local adminLookup = {}
+    local undecidedVoters = {}
 
     table.RemoveByValue( voters, caller )
     table.remove( args, 1 )
@@ -58,6 +69,11 @@ local function doVote( caller, args, optionCount )
 
         if isVoteAdmin and ply ~= caller then
             table.insert( adminPlys, ply )
+            adminLookup[ply] = true
+        end
+
+        if ply ~= caller then
+            undecidedVoters[ply] = true
         end
     end
 
@@ -65,6 +81,7 @@ local function doVote( caller, args, optionCount )
     CFC_Vote.voteCaller = caller
     CFC_Vote.voters = voters
     CFC_Vote.voteResults = voteResults
+    CFC_Vote.undecidedVoters = undecidedVoters
 
     local notif = CFCNotifications.new( CFC_Vote.NOTIFICATION_VOTE_NAME, "Buttons", true )
     local liveNotif = CFCNotifications.new( CFC_Vote.NOTIFICATION_LIVE_NAME, "Buttons", true )
@@ -107,6 +124,10 @@ local function doVote( caller, args, optionCount )
     resultNotif:SetPriority( CFCNotifications.PRIORITY_LOW )
 
     function notif:OnButtonPressed( ply, index )
+        if not undecidedVoters[ply] or type( index ) ~= "number" then return end
+        if index > optionCount or index < 1 or math.floor( index ) ~= index then return end
+
+        undecidedVoters[ply] = nil
         voteResults[index] = voteResults[index] + 1
         voteResults[optionCount + 1] = voteResults[optionCount + 1] - 1
         notif:RemovePopup( notif:GetCallingPopupID(), ply )
@@ -118,16 +139,17 @@ local function doVote( caller, args, optionCount )
         liveNotif:EditButtonText( optionCount + 2, 1, UndecidedText, CFC_Vote.voteCaller )
     end
 
-    function liveNotif:OnButtonPressed()
-        CFC_Vote.stopVote()
+    function liveNotif:OnButtonPressed( ply )
+        playerStopVote( ply )
     end
 
     function resultNotif:OnButtonPressed( ply )
         resultNotif:RemovePopup( resultNotif:GetCallingPopupID(), ply )
     end
 
-    function adminNotif:OnButtonPressed( _, stop )
+    function adminNotif:OnButtonPressed( ply, stop )
         if not stop then return end
+        if not adminLookup[ply] then return end
 
         CFC_Vote.stopVote( true )
     end
