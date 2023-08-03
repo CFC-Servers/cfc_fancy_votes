@@ -9,11 +9,11 @@ if CLIENT then
     if not ulx then return end
 
     local voteCmd = ulx.command( "Voting", "ulx cfcvote", function() end )
-    voteCmd:addParam{ type=ULib.cmds.StringArg, hint="title" }
-    voteCmd:addParam{ type=ULib.cmds.StringArg, hint="options", ULib.cmds.takeRestOfLine, repeat_min=2, repeat_max=10 }
+    voteCmd:addParam{ type = ULib.cmds.StringArg, hint = "title" }
+    voteCmd:addParam{ type = ULib.cmds.StringArg, hint = "options", ULib.cmds.takeRestOfLine, repeat_min = 2, repeat_max = 10 }
     voteCmd:defaultAccess( ULib.ACCESS_ADMIN )
     voteCmd:help( "Starts a fancy public vote." )
-    
+
     return
 end
 

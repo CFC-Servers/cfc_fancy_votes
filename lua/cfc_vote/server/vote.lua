@@ -58,7 +58,7 @@ local function doVote( caller, args, optionCount )
     table.RemoveByValue( voters, caller )
     table.remove( args, 1 )
 
-    for i, ply in ipairs( plys ) do
+    for _, ply in ipairs( plys ) do
         local isVoteAdmin
 
         if ULib then
@@ -294,9 +294,9 @@ local function voteFromULX( caller, title, ... )
     if not IsValid( caller ) then return end
 
     if CFC_Vote.voteInProgress then
-		ULib.tsayError( caller, "There is already a CFC vote in progress. Please wait for the current one to end.", true )
-		return
-	end
+        ULib.tsayError( caller, "There is already a CFC vote in progress. Please wait for the current one to end.", true )
+        return
+    end
 
     local args = { ... }
     local maxOptions = CFC_Vote.VOTE_MAX_OPTIONS:GetInt()
@@ -320,7 +320,7 @@ local function voteFromULX( caller, title, ... )
 end
 
 local voteCmd = ulx.command( "Voting", "ulx cfcvote", voteFromULX )
-voteCmd:addParam{ type=ULib.cmds.StringArg, hint="title" }
-voteCmd:addParam{ type=ULib.cmds.StringArg, hint="options", ULib.cmds.takeRestOfLine, repeat_min=2, repeat_max=CFC_Vote.VOTE_MAX_OPTIONS:GetInt() }
+voteCmd:addParam{ type = ULib.cmds.StringArg, hint = "title" }
+voteCmd:addParam{ type = ULib.cmds.StringArg, hint = "options", ULib.cmds.takeRestOfLine, repeat_min = 2, repeat_max = CFC_Vote.VOTE_MAX_OPTIONS:GetInt() }
 voteCmd:defaultAccess( ULib.ACCESS_ADMIN )
 voteCmd:help( "Starts a fancy public vote." )
